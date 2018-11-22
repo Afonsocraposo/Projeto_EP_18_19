@@ -3,6 +3,8 @@ from Grelha import *
 from Evento import *
 from CAP import *
 import numpy as np
+import matplotlib as mpl
+mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 
 
@@ -187,15 +189,98 @@ class Simulador:
             file.write(str(self.grelha.coordSEIR())+"\n")
 
         file.close()
-        return [self.tempos, self.infetados]
+        return [self.tempos, self.infetados, True]
+
+    def runGraphic(self):
+        file = open("resultados.txt", "w")
+        file.write(str(self.grelha.N) + "\n")
+        file.write(str(self.obstaculos) + "\n")
+
+        pygame.init()
+        size = self.grelha.width * 30
+        screen = pygame.display.set_mode((size, size))
+
+        time = pygame.time
+
+        running = True
+
+        myfont = pygame.font.SysFont('Arial', 12)
+        ended = False
+
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    break
+
+            if self.tempo <= self.Th and self.CAP.tamanho > 0:
+                evento = self.CAP.proximo()
+                self.CAP.pop()
+                self.tempo = evento.tempo
+
+                ID = evento.ID
+
+                if evento.tipo == "des":
+                    self.deslocamento(ID)
+                elif evento.tipo == "rep":
+                    self.reproducao(ID)
+                elif evento.tipo == "mor":
+                    self.morte(ID)
+                elif evento.tipo == "ava":
+                    self.avaliacao(ID)
+
+                self.tempos += [self.tempo]
+                self.infetados += [self.grelha.infetadosTot()]
+
+                screen.fill((0, 0, 0))
+
+                for i in range(len(self.grelha.grelha)):
+                    for j in range(len(self.grelha.grelha[0])):
+                        ind = self.grelha.grelha[i][j]
+                        if ind is not None:
+                            if ind == "!":
+                                pygame.draw.rect(screen, Color("gray"), (j * 30, i * 30, 30, 30), 0)
+                            else:
+                                if ind.estado == "S":
+                                    pygame.draw.rect(screen, Color("white"), (j * 30, i * 30, 30, 30), 0)
+                                elif ind.estado == "E":
+                                    pygame.draw.rect(screen, Color("yellow"), (j * 30, i * 30, 30, 30), 0)
+                                elif ind.estado == "I":
+                                    pygame.draw.rect(screen, Color("red"), (j * 30, i * 30, 30, 30), 0)
+                                elif ind.estado == "R":
+                                    pygame.draw.rect(screen, Color("green"), (j * 30, i * 30, 30, 30), 0)
+
+                                TextSurf = myfont.render(str(ind.ID), True, (0,0,0))
+                                TextRect = TextSurf.get_rect()
+                                TextRect.center = ((j * 30 + 15), (i * 30 + 15))
+                                screen.blit(TextSurf, TextRect)
+
+                TextSurf = myfont.render(str(round(self.tempo,2))+" s", True, (255, 255, 255))
+                TextRect = TextSurf.get_rect()
+                TextRect.center = ((size - TextRect[2]/2), TextRect[3]/2)
+                pygame.draw.rect(screen, Color("black"), TextRect, 0)
+                screen.blit(TextSurf, TextRect)
+
+                file.write(str(self.grelha.coordSEIR()) + "\n")
+
+            else:
+                ended = True
+                file.close()
+
+            pygame.display.update()
+
+            time.delay(1)
+
+        return [self.tempos, self.infetados, ended]
 
 
 if __name__ == '__main__':
     obs = [[2, i] for i in range(-10, 11)]
     sim = Simulador(10, 96, 4, 50, 1, 10, 20, 0.6, 0.3, 0.5, 1, 1, 10, obs)
     plot_data = sim.run()
-    plt.plot(plot_data[0], plot_data[1])
-    plt.title("Evolução do número de infetados ao longo do tempo")
-    plt.xlabel("Tempo [s]")
-    plt.ylabel("Número total de infetados")
-    plt.savefig("resultado.png")
+    if plot_data[2]:
+        plt.plot(plot_data[0], plot_data[1])
+        plt.title("Evolução do número de infetados ao longo do tempo")
+        plt.xlabel("Tempo [s]")
+        plt.ylabel("Número total de infetados")
+        plt.savefig("resultado.png")

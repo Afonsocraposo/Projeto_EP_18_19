@@ -213,7 +213,7 @@ class Grelha:
 
         for i in range(Pi):
             pos = livres.pop(random.randrange(len(livres)))
-            self.adicionar(Individuo(c, "E"), pos)
+            self.adicionar(Individuo(c, "I"), pos)
             c += 1
 
     def n1n2(self, pos):
