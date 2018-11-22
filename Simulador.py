@@ -277,7 +277,7 @@ class Simulador:
 if __name__ == '__main__':
     obs = [[2, i] for i in range(-10, 11)]
     sim = Simulador(10, 96, 4, 50, 1, 10, 20, 0.6, 0.3, 0.5, 1, 1, 10, obs)
-    plot_data = sim.run()
+    plot_data = sim.runGraphic()
     if plot_data[2]:
         plt.plot(plot_data[0], plot_data[1])
         plt.title("Evolução do número de infetados ao longo do tempo")
