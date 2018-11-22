@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
+import pygame
 
 
 class Simulador:
@@ -239,16 +240,16 @@ class Simulador:
                         ind = self.grelha.grelha[i][j]
                         if ind is not None:
                             if ind == "!":
-                                pygame.draw.rect(screen, Color("gray"), (j * 30, i * 30, 30, 30), 0)
+                                pygame.draw.rect(screen, pygame.Color("gray"), (j * 30, i * 30, 30, 30), 0)
                             else:
                                 if ind.estado == "S":
-                                    pygame.draw.rect(screen, Color("white"), (j * 30, i * 30, 30, 30), 0)
+                                    pygame.draw.rect(screen, pygame.Color("white"), (j * 30, i * 30, 30, 30), 0)
                                 elif ind.estado == "E":
-                                    pygame.draw.rect(screen, Color("yellow"), (j * 30, i * 30, 30, 30), 0)
+                                    pygame.draw.rect(screen, pygame.Color("yellow"), (j * 30, i * 30, 30, 30), 0)
                                 elif ind.estado == "I":
-                                    pygame.draw.rect(screen, Color("red"), (j * 30, i * 30, 30, 30), 0)
+                                    pygame.draw.rect(screen, pygame.Color("red"), (j * 30, i * 30, 30, 30), 0)
                                 elif ind.estado == "R":
-                                    pygame.draw.rect(screen, Color("green"), (j * 30, i * 30, 30, 30), 0)
+                                    pygame.draw.rect(screen, pygame.Color("green"), (j * 30, i * 30, 30, 30), 0)
 
                                 TextSurf = myfont.render(str(ind.ID), True, (0,0,0))
                                 TextRect = TextSurf.get_rect()
@@ -258,7 +259,7 @@ class Simulador:
                 TextSurf = myfont.render(str(round(self.tempo,2))+" s", True, (255, 255, 255))
                 TextRect = TextSurf.get_rect()
                 TextRect.center = ((size - TextRect[2]/2), TextRect[3]/2)
-                pygame.draw.rect(screen, Color("black"), TextRect, 0)
+                pygame.draw.rect(screen, pygame.Color("black"), TextRect, 0)
                 screen.blit(TextSurf, TextRect)
 
                 file.write(str(self.grelha.coordSEIR()) + "\n")
